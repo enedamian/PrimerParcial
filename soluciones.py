@@ -8,6 +8,23 @@ from functools import reduce
 # Luego, a ese resultado se le suma el año, y se calcula el módulo de la división por 7 (es el valor final que retorna la función).
 # Asegúrate de incluir manejo de errores para verificar que la cadena de fecha esté en el formato correcto y que los valores de día, mes y año sean números enteros.
 
+# les dejo otra forma de validar fecha extraida de un parcial:
+def validacionFecha(dia, mes, año):  # Realizamos funcion para validar que la fecha introducida sea correcta.
+    if 1 <= año <= 2023:
+        if 1 <= mes <= 12:
+            if mes in [1, 3, 5, 7, 8, 10, 12]:
+                return 1 <= dia <= 31
+            elif mes == 2:
+                # Febrero (posiblemente bisiesto)
+                if (año % 4 == 0 and año % 100 != 0) or (año % 400 == 0):
+                    return 1 <= dia <= 29
+                else:
+                    return 1 <= dia <= 28
+            else:
+                # Meses con 30 días
+                return 1 <= dia <= 30
+    return False
+
 def hashPrimerParcial(stringNombre, stringFecha):
     # Suma de los valores ascii de los caracteres del nombre    
     # alternativas com lambda:
@@ -108,6 +125,84 @@ def procesarVentas(rutaArchivo, cantidadEntradas):
         print("El archivo no existe")
     return 0
 
+# Alternativa 2
+#  el siguiente procesar ventas en lugar de generar una lista iba guardando en un string lo que tenía que mostrar luego por pantalla:
+def procesarVentas2(rutaArchivo, cantidadEntradas):
+    """Imprime listado de socios a los que se les vendio entradas y socios a los que no
+
+    Args:
+        rutaArchivo (str): Ruta del archivo con la informacion de solicitudes de entradas vendidas
+        cantidadEntradas (int): Cantidad de entradas disponibles
+    """
+    try:
+        archivo = open(rutaArchivo, "r", encoding = "UTF-8")
+        vendidas = 0
+        compraron = ""
+        noCompraron = ""
+        for linea in archivo:
+            datos = linea.split(",")
+            cantidad_entradas = int(datos[1])
+            if len(datos) == 2:
+                if vendidas + cantidad_entradas <= cantidadEntradas:
+                    vendidas += cantidad_entradas
+                    #compraron += f"{datos[0]}, {cantidad_entradas} entradas\n" if cantidad_entradas > 1 else f"{datos[0]}, 1 entrada\n"
+                    if cantidad_entradas == 1:
+                        compraron += f"{datos[0]}, 1 entrada\n"
+                    else:
+                        compraron += f"{datos[0]}, {cantidad_entradas} entradas\n"
+                else:
+                    noCompraron += f"{datos[0]}\n"
+        archivo.close()
+        impresion = ""
+        if compraron != "":
+            impresion += f"Entradas vendidas a:\n{compraron}\n"
+        if noCompraron != "":
+            impresion += f"Socios que no pudieron comprar entradas:\n{noCompraron}"
+        if impresion != "":
+            print(impresion)
+        else:
+            print("Nadie solicito comprar entradas")
+        return
+    except FileNotFoundError:
+        print("Archivo no encontrado")
+        return
+
+# alternativa 3
+def existe_archivo(archivo):
+    """Devulve True si el archivo existe, y False en caso contrario"""
+    if os.path.isfile(archivo):
+        return True 
+    else:
+        return False
+
+def enListar(ruta):
+    socios=[]
+    if existe_archivo(ruta):
+
+        with open(ruta, 'r', encoding="utf-8") as file:
+            for line in file:
+                nombre,entradas = line.strip().split(',')
+                socio = {'nombre':nombre,'entradas': entradas}
+                socios.append(socio)
+        return socios
+
+def procesarVentas3(rutaArchivo, cantidadEntradas):
+    listaSocios = enListar(rutaArchivo)
+    vendidas=0
+    listaSociosCompraron=[]
+    listaSociosNOCompraron=[]
+    for socio in listaSocios:
+        if cantidadEntradas>vendidas and int(socio['entradas'])<=(cantidadEntradas-vendidas):
+            vendidas+= int(socio['entradas'])
+            datos={'nombre':socio['nombre'],'entradas':socio['entradas']}
+            listaSociosCompraron.append(datos)
+        else:
+            datos={'nombre':socio['nombre'],'entradas':socio['entradas']}
+            listaSociosNOCompraron.append(datos)
+
+    return listaSociosCompraron, listaSociosNOCompraron
+
+
 #procesarVentas('entradas.csv', 20)
 
 # 4: a)  los datos se procesaron como una estructura de datos llamada "cola" que sigue el principio 
@@ -140,6 +235,7 @@ lista_stock_a_vencer = [
     {"producto": "pan", "cantidad": 300}, {"producto": "leche", "cantidad": 100},
     {"producto": "galletitas", "cantidad": 50}, {"producto": "cacao", "cantidad": 150}]
 
+#la siguiente función, como vimos en clase, funciona pero modifica la lista original
 def generarLista(lista_precios, lista_stock_a_vencer):
     lista_remate =[]
     for producto in lista_stock_a_vencer:
@@ -149,10 +245,28 @@ def generarLista(lista_precios, lista_stock_a_vencer):
                 lista_remate.append(producto)
     return lista_remate
 
-# algunos resolvieron igual que en el ciclo anterior pero generando un nuevo 
-# diccionario agregandole todos los campos, tambien está bien
-
+# Alternativa 2
 def generarLista2(lista_precios, lista_stock_a_vencer):
+    lista_resultado = []
+    for producto_precio in lista_precios:
+        for producto_a_vencer in lista_stock_a_vencer:
+            if producto_precio["producto"] == producto_a_vencer["producto"]:
+                precio = producto_precio["precio"]
+                precio_promocional = precio - (precio * 0.2)
+                # crea un diccionario para guardar los datos en la lista_resultado
+                producto = {
+                    "producto": producto_precio["producto"],
+                    "cantidad": producto_a_vencer["cantidad"],
+                    "precio_promocional": precio_promocional
+                }
+        lista_resultado.append(producto)
+    return lista_resultado
+
+# algunos resolvieron igual que en el ciclo anterior pero generando un nuevo 
+# diccionario agregandole el precio original también.
+
+# Alternativa 3
+def generarLista3(lista_precios, lista_stock_a_vencer):
     lista_remate = [ { 'producto': producto['producto'], 'cantidad' : producto['cantidad'], 'precio_promocional': precio['precio'] * 0.8 } for producto in lista_stock_a_vencer for precio in lista_precios if producto['producto'] == precio['producto'] ]
     return lista_remate
 

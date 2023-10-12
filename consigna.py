@@ -4,7 +4,7 @@
 # Legajo
 
 # 1) implementar una funcion hashPrimerParcial(stringNombre, stringFecha) que recibe un nombre y una fecha de nacimiento y devuelve un numero 
-# entero que representa el hash de la persona. stringFecha tiene formato dd-mm-aaaa. El hash se calculará de la siguiente forma:
+# entero que representa el hash de la persona. stringFecha tiene formato "dd-mm-aaaa". El hash se calculará de la siguiente forma:
 # Se deben sumar los valores ASCII de los caracteres del nombre. (los valores ASCII se obtienen con la funcion "ord(caracter)" de python)
 # Si la suma de los caracteres es un numero impar se debe sumar el dia de la fecha de nacimiento y calcular el residuo de la division por 5.
 # Si la suma de los caracteres es un numero par se debe sumar el mes de la fecha de nacimiento y calcular el residuo de la division por 5.
@@ -58,7 +58,7 @@ def procesarVentas(rutaArchivo, cantidadEntradas):
 # generar una nueva lista de diccionarios que contenga para cada producto la cantidad de unidades que están por vencer y un precio promocional con 20% de descuento.
 # Ejemplo:
 # lista_precios = [{"producto": "arroz", "precio": 125.50}, {"producto": "fideos", "precio": 50.75}, {"producto": "pan", "precio": 35.00}]
-# lista_ventas = [{"producto": "arroz", "cantidad": 100}, {"producto": "fideos", "cantidad": 200}, {"producto": "pan", "cantidad": 300}]
+# lista_stock_a_vencer = [{"producto": "arroz", "cantidad": 100}, {"producto": "fideos", "cantidad": 200}, {"producto": "pan", "cantidad": 300}]
 # lista_resultado = [{"producto": "arroz", "cantidad": 100, "precio_promocional": 112.95}, {"producto": "fideos", "cantidad": 200, "precio_promocional": 45.675}, {"producto": "pan", "cantidad": 300, "precio_promocional": 31.5}]
 
 lista_precios = [
